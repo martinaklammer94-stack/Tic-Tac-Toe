@@ -7,9 +7,12 @@ let boardData = [
 
 // Define player variables
 let player = 1;
+let gameOver = false;
 
 // Pull in cells from DOM
 const cellElements = document.querySelectorAll(".cell");
+// Pull in the result text from DOM
+const resultElement = document.getElementById("result");
 
 // Add Event Listener
 cellElements.forEach((cell, index) => {
@@ -24,7 +27,7 @@ function placeMarker(index) {
   let col = index % 3;
   let row = (index - col) / 3;
   // Check if the current cell is empty
-  if (boardData[row][col] == 0) {
+  if (boardData[row][col] == 0 && gameOver == false) {
     boardData[row][col] = player;
     // Change player
     player *= -1;
@@ -60,10 +63,12 @@ function checkResult() {
     let colSum = boardData[0][i] + boardData[1][i] + boardData[2][i];
     if (rowSum == 3 || colSum == 3) {
       // Player 1 wins
-      console.log("Player 1 wins");
+      endGame(1);
+      return;
     } else if (rowSum == -3 || colSum == -3) {
       // Player 2 wins
-      console.log("Player 2 wins");
+      endGame(2);
+      return;
     }
   }
 
@@ -72,10 +77,12 @@ function checkResult() {
   let diagonalSum2 = boardData[0][2] + boardData[1][1] + boardData[2][0];
   if (diagonalSum1 == 3 || diagonalSum2 == 3) {
     // Player 1 wins
-    console.log("Player 1 wins");
+    endGame(1);
+    return;
   } else if (diagonalSum1 == -3 || diagonalSum2 == -3) {
     // Player 2 wins
-    console.log("Player 2 wins");
+    endGame(2);
+    return;
   }
 
   // Check for a tie
@@ -84,6 +91,39 @@ function checkResult() {
     boardData[1].indexOf(0) == -1 &&
     boardData[2].indexOf(0) == -1
   ) {
-    console.log("Tie");
+    endGame(0);
+    return;
   }
 }
+
+//Function to end the game and display the result
+function endGame(winner) {
+  // Trigger game over
+  gameOver = true;
+  // Check if game ended in a tie
+  if (winner == 0) {
+    resultElement.innerText = "It's a tie!";
+  } else {
+    resultElement.innerText = `Player ${winner} wins!`;
+  }
+}
+
+// Restart Game
+const restartButton = document.getElementById("restart");
+// Add event listener to restart button
+restartButton.addEventListener("click", () => {
+  // Reset game variables
+  boardData = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+  ];
+  player = 1;
+  gameOver = false;
+  // Reset game board
+  cellElements.forEach((cell) => {
+    cell.classList.remove("cross", "circle");
+  });
+  // Reset outcome text
+  resultElement.innerText = "";
+});
